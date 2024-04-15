@@ -16,27 +16,55 @@ const RegisterForm = () => {
   const [email, setEmail] = useState("");
   const [contact, setContact] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("user exist");
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault(); //this is used to when we click on button page set auto loaded, to avoid that using preventDefault
     if (!name || !email || !password || !contact) {
       setError("All fields are necessary");
       return;
     }
+
+    try {
+      const res = await fetch("api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          contact,
+          password,
+        }),
+      });
+
+      //   if (res.ok) {
+      // const form = e.target;
+      // form.reset();
+      if (res.ok) {
+        setName("");
+        setEmail("");
+        setContact("");
+        setPassword("");
+        setError("");
+      } else {
+        setError("Registration failed. Please try again.");
+      }
+    } catch (error) {
+      console.log("Error during registration:", error);
+    }
   };
   return (
-    <form onSubmit={handleSubmit}>
-      <Card className="w-96">
-        <CardHeader
-          variant="gradient"
-          color="gray"
-          className="mb-4 grid h-28 place-items-center"
-        >
-          <Typography variant="h3" color="white">
-            Sign Up
-          </Typography>
-        </CardHeader>
+    <Card className="w-96">
+      <CardHeader
+        variant="gradient"
+        color="gray"
+        className="mb-4 grid h-28 place-items-center"
+      >
+        <Typography variant="h3" color="white">
+          Sign Up
+        </Typography>
+      </CardHeader>
+      <form onSubmit={handleSubmit}>
         <CardBody className="flex flex-col gap-4">
           <Input
             label="Full Name"
@@ -59,7 +87,6 @@ const RegisterForm = () => {
             type="password"
             onChange={(e) => setPassword(e.target.value)}
           />
-          {/* <Input label="Confirm Password" size="lg" type="password" /> */}
         </CardBody>
         <CardFooter className="pt-0">
           <Button variant="gradient" fullWidth>
@@ -77,8 +104,8 @@ const RegisterForm = () => {
             </Link>
           </Typography>
         </CardFooter>
-      </Card>
-    </form>
+      </form>
+    </Card>
   );
 };
 
